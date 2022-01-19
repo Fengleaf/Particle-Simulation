@@ -18,6 +18,12 @@ public class ClothSystem : MonoBehaviour
     public List<Vector2> UVs = new List<Vector2>();
     public List<int> TrianglesIndexes = new List<int>();
 
+    public float Mass = 1;
+    public float Gravity = -9.81f;
+
+    private List<SpringSystem> springArray = new List<SpringSystem>();
+    private List<Vector3> speedArray = new List<Vector3>();
+
     public Texture Texture;
     public Material TwoSideMat;
     private MeshFilter meshFilter;
@@ -51,6 +57,12 @@ public class ClothSystem : MonoBehaviour
                 float v = (float)j / (SideCount - 1);
                 UVs.Add(new Vector2(u, v));
                 #endregion
+                #region 速度，初始化為0
+                speedArray.Add(Vector3.zero);
+                #endregion
+                #region 每個點連接彈簧
+                AddSpringWithIndex(i * SideCount + j);
+                #endregion
             }
         }
 
@@ -78,5 +90,57 @@ public class ClothSystem : MonoBehaviour
         mesh.vertices = Vertexes.ToArray();
         mesh.uv = UVs.ToArray();
         mesh.triangles = TrianglesIndexes.ToArray();
+    }
+
+    private void FixedUpdate()
+    {
+        // 彈簧
+        List<Vector3> tempSpeedArray = new List<Vector3>(speedArray.Count);
+        for (int i = 0; i < springArray.Count; i++)
+        {
+            // 拿彈簧的起始粒子與結束粒子
+            int startIndex = springArray[i].ConnectIndexStart;
+            int endIndex = springArray[i].ConnectIndexEnd;
+
+            // 拿現在速度
+            Vector3 startSpeed = speedArray[startIndex];
+            Vector3 endSpeed = speedArray[endIndex];
+            // 拿現在位置
+            Vector3 startPos = Vertexes[startIndex];
+            Vector3 endPos = Vertexes[endIndex];
+
+            Vector3 tempForce = springArray[i].CountForce(startSpeed, endSpeed, startPos, endPos);
+            // 不知道在幹嘛
+            tempSpeedArray[startIndex] += tempForce / Mass * Time.fixedDeltaTime;
+            tempSpeedArray[endIndex] -= tempForce / Mass * Time.fixedDeltaTime;
+        }
+    }
+
+    private void AddSpringWithIndex(int index)
+    {
+        int NextIndex;
+        // Structural Springs
+        // 向上
+        NextIndex = index + 1;
+        if (NextIndex < SideCount)
+            springArray.Add(new SpringSystem(index, NextIndex, UnitDistance));
+        // 向右
+        NextIndex = index + SideCount;
+        if (NextIndex / SideCount < SideCount)
+            springArray.Add(new SpringSystem(index, NextIndex, UnitDistance));
+        // Shear Springs
+        // 右上
+        NextIndex = index + SideCount + 1;
+        if (NextIndex / SideCount < SideCount)
+            springArray.Add(new SpringSystem(index, NextIndex, UnitDistance * Mathf.Sqrt(2)));
+        // Bending Springs
+        // 向上
+        NextIndex = index + 2;
+        if (NextIndex < SideCount)
+            springArray.Add(new SpringSystem(index, NextIndex, UnitDistance * 2));
+        // 向右
+        NextIndex = index + SideCount * 2;
+        if (NextIndex / SideCount < SideCount)
+            springArray.Add(new SpringSystem(index, NextIndex, UnitDistance * 2));
     }
 }
