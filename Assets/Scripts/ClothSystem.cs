@@ -6,11 +6,6 @@ public class ClothSystem : MonoBehaviour
 {
     public GameObject ParticlePrefab;
 
-    public List<GameObject> Particles = new List<GameObject>();
-    public List<Vector3> Vertexes = new List<Vector3>();
-    public List<Vector2> UVs = new List<Vector2>();
-    public List<int> TrianglesIndexes = new List<int>();
-
     // 邊有幾顆粒子
     public int SideCount = 10;
     // 布料初始高度
@@ -18,8 +13,13 @@ public class ClothSystem : MonoBehaviour
     // 每顆粒子距離
     public float UnitDistance = 1;
 
-    public Texture texture;
-    public Material twoSideMat;
+    public List<GameObject> Particles = new List<GameObject>();
+    public List<Vector3> Vertexes = new List<Vector3>();
+    public List<Vector2> UVs = new List<Vector2>();
+    public List<int> TrianglesIndexes = new List<int>();
+
+    public Texture Texture;
+    public Material TwoSideMat;
     private MeshFilter meshFilter;
     private MeshRenderer meshRender;
 
@@ -32,8 +32,8 @@ public class ClothSystem : MonoBehaviour
         // 創建 Mesh
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
-        meshRender.material = twoSideMat;
-        meshRender.material.mainTexture = texture;
+        meshRender.material = TwoSideMat;
+        meshRender.material.mainTexture = Texture;
 
         for (int i = 0; i < SideCount; i++)
         {
