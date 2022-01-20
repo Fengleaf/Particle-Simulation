@@ -58,11 +58,11 @@ public class ClothSystem : MonoBehaviour
                 #region 產生粒子
                 Vector3 position = new Vector3(i * UnitDistance, InitialHeight, j * UnitDistance);
                 Vertexes.Add(position);
-                //GameObject particle = Instantiate(ParticlePrefab, position, Quaternion.identity, transform);
-                GameObject particle = new GameObject();
+                GameObject particle = Instantiate(ParticlePrefab, position, Quaternion.identity, transform);
+                //GameObject particle = new GameObject();
                 particle.name = $"Particle {i} * {j}";
-                particle.transform.position = position;
-                particle.transform.parent = transform;
+                //particle.transform.position = position;
+                //particle.transform.parent = transform;
                 Particles.Add(particle);
                 Colliders.Add(particle.AddComponent<Collider>());
                 #endregion

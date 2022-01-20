@@ -42,7 +42,7 @@ public class ControllPntManager : MonoBehaviour
                 if (Physics.Raycast(ray, out hit))
                 {
                     Transform objectHit = hit.transform;
-                    if (objectHit.CompareTag("ControllPnt"))
+                    if (objectHit.CompareTag("Particle"))
                     {
                         Debug.Log("1st Hit：" + objectHit.gameObject.name);
                         tmpInGamePivot = Instantiate(pivot, Vector3.zero, Quaternion.identity, objectHit);
