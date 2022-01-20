@@ -2,6 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum ForceStatus
+{
+    Euler,
+    RungeKutta2,
+    RungeKutta4
+}
+
 public class ClothSystem : MonoBehaviour
 {
     public GameObject ParticlePrefab;
@@ -17,6 +24,8 @@ public class ClothSystem : MonoBehaviour
     public List<Vector3> Vertexes = new List<Vector3>();
     public List<Vector2> UVs = new List<Vector2>();
     public List<int> TrianglesIndexes = new List<int>();
+
+    public ForceStatus forceStatus = ForceStatus.Euler;
 
     public float Mass = 1;
     public float Gravity = -9.81f;
@@ -95,7 +104,7 @@ public class ClothSystem : MonoBehaviour
     private void FixedUpdate()
     {
         // 彈簧
-        List<Vector3> tempSpeedArray = new List<Vector3>(speedArray.Count);
+        Vector3[] tempSpeedArray = new Vector3[speedArray.Count];
         for (int i = 0; i < springArray.Count; i++)
         {
             // 拿彈簧的起始粒子與結束粒子
@@ -110,10 +119,46 @@ public class ClothSystem : MonoBehaviour
             Vector3 endPos = Vertexes[endIndex];
 
             Vector3 tempForce = springArray[i].CountForce(startSpeed, endSpeed, startPos, endPos);
-            // 不知道在幹嘛
+            // 彈簧拉扯，對起始粒子來說是正向，對終點粒子來說是負向
             tempSpeedArray[startIndex] += tempForce / Mass * Time.fixedDeltaTime;
             tempSpeedArray[endIndex] -= tempForce / Mass * Time.fixedDeltaTime;
         }
+        // 存入 SpeedArray
+        for (int i = 0; i < speedArray.Count; i++)
+        {
+            speedArray[i] += tempSpeedArray[i];
+            // 重力
+            speedArray[i] += Vector3.up * Gravity * Time.fixedDeltaTime;
+            // TODO: 碰撞檢測
+        }
+        // 衣服上兩個點固定住
+        speedArray[SideCount * SideCount - 1] = Vector3.zero;
+        speedArray[SideCount - 1] = Vector3.zero;
+        // 更新粒子資訊
+        for (int i = 0; i < SideCount; i++)
+        {
+            for (int j = 0; j < SideCount; j++)
+            {
+                int index = i * SideCount + j;
+                Vector3 result = Vector3.zero;
+                switch (forceStatus)
+                {
+                    case ForceStatus.Euler:
+                        result = EulerMethod(index, Time.fixedDeltaTime);
+                        break;
+                    case ForceStatus.RungeKutta2:
+                        break;
+                    case ForceStatus.RungeKutta4:
+                        break;
+                    default:
+                        break;
+                }
+                // TODO: 碰撞
+                Vertexes[index] += result;
+                Particles[index].transform.position = Vertexes[index];
+            }
+        }
+        meshFilter.mesh.vertices = Vertexes.ToArray();
     }
 
     private void AddSpringWithIndex(int index)
@@ -142,5 +187,11 @@ public class ClothSystem : MonoBehaviour
         NextIndex = index + SideCount * 2;
         if (NextIndex / SideCount < SideCount)
             springArray.Add(new SpringSystem(index, NextIndex, UnitDistance * 2));
+    }
+
+    // 一般的 Euler 方法
+    private Vector3 EulerMethod(int CurrentIndex, float GapTime)
+    {
+        return speedArray[CurrentIndex] * GapTime;
     }
 }

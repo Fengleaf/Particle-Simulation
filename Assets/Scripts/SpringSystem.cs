@@ -22,6 +22,7 @@ public class SpringSystem : MonoBehaviour
 
     public Vector3 CountForce(Vector3 startSpeed, Vector3 endSpeed, Vector3 startPos, Vector3 endPos)
     {
+        // Damped spring
         float distance = Vector3.Distance(startPos, endPos);
         return -(Ks * (distance - OriginLength) + Kd * Vector3.Dot(startSpeed - endSpeed, startPos - endPos) / distance)
             * (startPos - endPos) / distance;
