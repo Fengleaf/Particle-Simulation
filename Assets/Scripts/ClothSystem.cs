@@ -62,6 +62,7 @@ public class ClothSystem : MonoBehaviour
                 particle.name = $"Particle {i} * {j}";
                 particle.transform.position = position;
                 particle.transform.parent = transform;
+                particle.AddComponent<Collider>();
                 Particles.Add(particle);
                 #endregion
                 #region UV
@@ -132,7 +133,9 @@ public class ClothSystem : MonoBehaviour
             speedArray[i] += tempspeedArray[i];
             // 重力
             speedArray[i] += Vector3.up * Gravity * Time.fixedDeltaTime;
-            // TODO: 碰撞檢測
+            // 碰撞檢測
+            if (Particles[i].GetComponent<Collider>().RayCast(speedArray[i]))
+                speedArray[i] = Vector3.zero;
         }
         // 衣服上兩個點固定住
         speedArray[SideCount * SideCount - 1] = Vector3.zero;
@@ -158,8 +161,9 @@ public class ClothSystem : MonoBehaviour
                     default:
                         break;
                 }
-                // TODO: 碰撞
-                Vertexes[index] += result;
+                // 碰撞
+                if (!Particles[index].GetComponent<Collider>().IsCollision)
+                    Vertexes[index] += result;
                 Particles[index].transform.position = Vertexes[index];
             }
         }
@@ -172,7 +176,8 @@ public class ClothSystem : MonoBehaviour
         // Structural Springs
         // 向上
         NextIndex = index + 1;
-        if (NextIndex < SideCount)
+        // 確保在同一行
+        if (NextIndex / SideCount == index / SideCount)
             springArray.Add(new SpringSystem(index, NextIndex, UnitDistance));
         // 向右
         NextIndex = index + SideCount;
