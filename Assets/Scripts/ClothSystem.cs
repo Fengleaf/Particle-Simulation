@@ -21,6 +21,7 @@ public class ClothSystem : MonoBehaviour
     public float UnitDistance = 1;
 
     public List<GameObject> Particles = new List<GameObject>();
+    public List<Collider> Colliders = new List<Collider>();
     public List<Vector3> Vertexes = new List<Vector3>();
     public List<Vector2> UVs = new List<Vector2>();
     public List<int> TrianglesIndexes = new List<int>();
@@ -62,8 +63,8 @@ public class ClothSystem : MonoBehaviour
                 particle.name = $"Particle {i} * {j}";
                 particle.transform.position = position;
                 particle.transform.parent = transform;
-                particle.AddComponent<Collider>();
                 Particles.Add(particle);
+                Colliders.Add(particle.AddComponent<Collider>());
                 #endregion
                 #region UV
                 float u = (float)i / (SideCount - 1);
@@ -134,8 +135,12 @@ public class ClothSystem : MonoBehaviour
             // 重力
             speedArray[i] += Vector3.up * Gravity * Time.fixedDeltaTime;
             // 碰撞檢測
-            if (Particles[i].GetComponent<Collider>().RayCast(speedArray[i]))
+            if (Colliders[i].RayCast(speedArray[i]))
+            {
                 speedArray[i] = Vector3.zero;
+                //speedArray[i] *= -1;
+                //speedArray[i] += Colliders[i].RelativeVector;
+            }
         }
         // 衣服上兩個點固定住
         speedArray[SideCount * SideCount - 1] = Vector3.zero;
@@ -162,8 +167,10 @@ public class ClothSystem : MonoBehaviour
                         break;
                 }
                 // 碰撞
-                if (!Particles[index].GetComponent<Collider>().IsCollision)
+                if (!Colliders[index].IsCollision)
                     Vertexes[index] += result;
+                //else
+                //    Vertexes[index] = Colliders[index].HitPoint;
                 Particles[index].transform.position = Vertexes[index];
             }
         }
