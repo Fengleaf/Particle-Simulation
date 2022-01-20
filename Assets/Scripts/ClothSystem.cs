@@ -25,7 +25,7 @@ public class ClothSystem : MonoBehaviour
     public List<Vector2> UVs = new List<Vector2>();
     public List<int> TrianglesIndexes = new List<int>();
 
-    public ForceStatus forceStatus = ForceStatus.Euler;
+    public ForceStatus ForceStatus = ForceStatus.RungeKutta2;
 
     public float Mass = 1;
     public float Gravity = -9.81f;
@@ -57,8 +57,11 @@ public class ClothSystem : MonoBehaviour
                 #region 產生粒子
                 Vector3 position = new Vector3(i * UnitDistance, InitialHeight, j * UnitDistance);
                 Vertexes.Add(position);
-                GameObject particle = Instantiate(ParticlePrefab, position, Quaternion.identity, transform);
+                //GameObject particle = Instantiate(ParticlePrefab, position, Quaternion.identity, transform);
+                GameObject particle = new GameObject();
                 particle.name = $"Particle {i} * {j}";
+                particle.transform.position = position;
+                particle.transform.parent = transform;
                 Particles.Add(particle);
                 #endregion
                 #region UV
@@ -104,7 +107,7 @@ public class ClothSystem : MonoBehaviour
     private void FixedUpdate()
     {
         // 彈簧
-        Vector3[] tempSpeedArray = new Vector3[speedArray.Count];
+        Vector3[] tempspeedArray = new Vector3[speedArray.Count];
         for (int i = 0; i < springArray.Count; i++)
         {
             // 拿彈簧的起始粒子與結束粒子
@@ -120,13 +123,13 @@ public class ClothSystem : MonoBehaviour
 
             Vector3 tempForce = springArray[i].CountForce(startSpeed, endSpeed, startPos, endPos);
             // 彈簧拉扯，對起始粒子來說是正向，對終點粒子來說是負向
-            tempSpeedArray[startIndex] += tempForce / Mass * Time.fixedDeltaTime;
-            tempSpeedArray[endIndex] -= tempForce / Mass * Time.fixedDeltaTime;
+            tempspeedArray[startIndex] += tempForce / Mass * Time.fixedDeltaTime;
+            tempspeedArray[endIndex] -= tempForce / Mass * Time.fixedDeltaTime;
         }
-        // 存入 SpeedArray
+        // 存入 speedArray
         for (int i = 0; i < speedArray.Count; i++)
         {
-            speedArray[i] += tempSpeedArray[i];
+            speedArray[i] += tempspeedArray[i];
             // 重力
             speedArray[i] += Vector3.up * Gravity * Time.fixedDeltaTime;
             // TODO: 碰撞檢測
@@ -141,14 +144,16 @@ public class ClothSystem : MonoBehaviour
             {
                 int index = i * SideCount + j;
                 Vector3 result = Vector3.zero;
-                switch (forceStatus)
+                switch (ForceStatus)
                 {
                     case ForceStatus.Euler:
                         result = EulerMethod(index, Time.fixedDeltaTime);
                         break;
                     case ForceStatus.RungeKutta2:
+                        result = RungeKutta2(index, Time.fixedDeltaTime);
                         break;
                     case ForceStatus.RungeKutta4:
+                        result = RunguKutta4(index, Time.fixedDeltaTime);
                         break;
                     default:
                         break;
@@ -176,7 +181,12 @@ public class ClothSystem : MonoBehaviour
         // Shear Springs
         // 右上
         NextIndex = index + SideCount + 1;
-        if (NextIndex / SideCount < SideCount)
+        // 避免超出邊界且要在隔壁
+        if (NextIndex / SideCount < SideCount && NextIndex / SideCount == index / SideCount + 1)
+            springArray.Add(new SpringSystem(index, NextIndex, UnitDistance * Mathf.Sqrt(2)));
+        // 左上
+        NextIndex = index - SideCount + 1;
+        if (NextIndex > 0 && NextIndex / SideCount < SideCount && NextIndex / SideCount == index / SideCount - 1)
             springArray.Add(new SpringSystem(index, NextIndex, UnitDistance * Mathf.Sqrt(2)));
         // Bending Springs
         // 向上
@@ -190,8 +200,145 @@ public class ClothSystem : MonoBehaviour
     }
 
     // 一般的 Euler 方法
-    private Vector3 EulerMethod(int CurrentIndex, float GapTime)
+    private Vector3 EulerMethod(int index, float time)
     {
-        return speedArray[CurrentIndex] * GapTime;
+        // x = vt
+        return speedArray[index] * time;
+    }
+
+    private Vector3 RungeKutta2(int index, float time)
+    {
+        // 固定的點不計算
+        if (index == SideCount - 1 || index == SideCount * SideCount - 1)
+            return Vector3.zero;
+        // K1
+        Vector3 k1 = EulerMethod(index, time);
+        // K2
+        // V = a t
+        Vector3 appendSpeedK2 = Vector3.up * Gravity * Time.deltaTime / 2;
+        for (int i = 0; i < springArray.Count; i++)
+        {
+            if (springArray[i].ConnectIndexStart == index || springArray[i].ConnectIndexEnd == index)
+            {
+                // 拿 Index
+                int StartIndex = springArray[i].ConnectIndexStart;
+                int EndIndex = springArray[i].ConnectIndexEnd;
+
+                // 拿資料
+                Vector3 StartSpeed = speedArray[StartIndex];
+                Vector3 EndSpeed = speedArray[EndIndex];
+                Vector3 StartPos = Vertexes[StartIndex] + EulerMethod(StartIndex, time / 2);
+                Vector3 EndPos = Vertexes[EndIndex] + EulerMethod(EndIndex, time / 2);
+
+                Vector3 tempForce = springArray[i].CountForce(StartSpeed, EndSpeed, StartPos, EndPos);
+
+                if (index == springArray[i].ConnectIndexStart)
+                    appendSpeedK2 += tempForce / Mass * Time.fixedDeltaTime;
+                else
+                    appendSpeedK2 -= tempForce / Mass * Time.fixedDeltaTime;
+            }
+        }
+        Vector3 k2 = EulerMethodWithAppendForce(index, time / 2, appendSpeedK2);
+        return k2;
+    }
+
+    // 算下一段時間，會加上下一秒的力
+    private Vector3 EulerMethodWithAppendForce(int index, float time, Vector3 appendForce)
+    {
+        return (speedArray[index] + appendForce) * time;
+    }
+
+    private Vector3 RunguKutta4(int index, float time)
+    {
+        // 固定的點不計算
+        if (index == SideCount - 1 || index == SideCount * SideCount - 1)
+            return Vector3.zero;
+        // K1
+        Vector3 k1 = EulerMethod(index, time);
+        // K2
+        Vector3 appendSpeedK2 = Vector3.up * Gravity * Time.deltaTime / 2;
+        for (int i = 0; i < springArray.Count; i++)
+        {
+            if (springArray[i].ConnectIndexStart == index || springArray[i].ConnectIndexEnd == index)
+            {
+                // 拿 Index
+                int StartIndex = springArray[i].ConnectIndexStart;
+                int EndIndex = springArray[i].ConnectIndexEnd;
+
+                // 拿資料
+                Vector3 StartSpeed = speedArray[StartIndex];
+                Vector3 EndSpeed = speedArray[EndIndex];
+                Vector3 StartPos = Vertexes[StartIndex] + EulerMethod(StartIndex, time / 2);
+                Vector3 EndPos = Vertexes[EndIndex] + EulerMethod(EndIndex, time / 2);
+
+                Vector3 tempForce = springArray[i].CountForce(StartSpeed, EndSpeed, StartPos, EndPos);
+
+                if (index == springArray[i].ConnectIndexStart)
+                    appendSpeedK2 += tempForce / Mass * Time.fixedDeltaTime;
+                else
+                    appendSpeedK2 -= tempForce / Mass * Time.fixedDeltaTime;
+            }
+        }
+        Vector3 k2 = EulerMethodWithAppendForce(index, time / 2, appendSpeedK2);
+        // K3
+        Vector3 appendSpeedK3 = Vector3.up * Gravity * Time.deltaTime / 2;
+        for (int i = 0; i < springArray.Count; i++)
+        {
+            if (springArray[i].ConnectIndexStart == index || springArray[i].ConnectIndexEnd == index)
+            {
+                // 拿 Index
+                int StartIndex = springArray[i].ConnectIndexStart;
+                int EndIndex = springArray[i].ConnectIndexEnd;
+
+                // 拿資料
+                Vector3 StartSpeed = speedArray[StartIndex];
+                Vector3 EndSpeed = speedArray[EndIndex];
+                Vector3 StartPos = Vertexes[StartIndex] + EulerMethodWithAppendForce(index, time / 2, appendSpeedK2);
+                Vector3 EndPos = Vertexes[EndIndex] + EulerMethodWithAppendForce(index, time / 2, appendSpeedK2);
+
+                Vector3 tempForce = springArray[i].CountForce(StartSpeed, EndSpeed, StartPos, EndPos);
+
+                if (index == springArray[i].ConnectIndexStart)
+                    appendSpeedK3 += tempForce / Mass * Time.fixedDeltaTime;
+                else
+                    appendSpeedK3 -= tempForce / Mass * Time.fixedDeltaTime;
+            }
+        }
+        Vector3 k3 = EulerMethodWithAppendForce(index, time / 2, appendSpeedK3);
+        // K4
+        Vector3 appendSpeedK4 = Vector3.up * Gravity * Time.deltaTime / 2;                                  // V = a t
+        for (int i = 0; i < springArray.Count; i++)
+            if (springArray[i].ConnectIndexStart == index || springArray[i].ConnectIndexEnd == index)
+            {
+                // 拿 Index
+                int StartIndex = springArray[i].ConnectIndexStart;
+                int EndIndex = springArray[i].ConnectIndexEnd;
+
+                // 拿資料
+                Vector3 StartSpeed = speedArray[StartIndex];
+                Vector3 EndSpeed = speedArray[EndIndex];
+                Vector3 StartPos = Vertexes[StartIndex] + EulerMethodWithAppendForce(index, time, appendSpeedK3);
+                Vector3 EndPos = Vertexes[EndIndex] + EulerMethodWithAppendForce(index, time, appendSpeedK3);
+
+                Vector3 tempForce = springArray[i].CountForce(StartSpeed, EndSpeed, StartPos, EndPos);
+
+                if (index == springArray[i].ConnectIndexStart)
+                    appendSpeedK4 += tempForce / Mass * Time.fixedDeltaTime;
+                else
+                    appendSpeedK4 -= tempForce / Mass * Time.fixedDeltaTime;
+            }
+
+        Vector3 k4 = EulerMethodWithAppendForce(index, time, appendSpeedK4);
+        return k1 / 6.0f + k2 / 3.0f + k3 / 3.0f + k4 / 6.0f;
+    }
+
+    private void OnDrawGizmos()
+    {
+        for (int i = 0; i < springArray.Count; i++)
+        {
+            int startIndex = springArray[i].ConnectIndexStart;
+            int endIndex = springArray[i].ConnectIndexEnd;
+            Gizmos.DrawLine(Particles[startIndex].transform.position, Particles[endIndex].transform.position);
+        }
     }
 }
