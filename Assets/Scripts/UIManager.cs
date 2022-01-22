@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Newtonsoft.Json;
 using System.IO;
 using SFB;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -31,6 +32,8 @@ public class UIManager : MonoBehaviour
     public Button PlayButton;
     public Button SaveButton;
     public Button LoadButton;
+
+    public Button ClearButton;
 
     private float mass;
     private ForceStatus method;
@@ -59,6 +62,7 @@ public class UIManager : MonoBehaviour
         PlayButton.onClick.AddListener(Play);
         SaveButton.onClick.AddListener(Save);
         LoadButton.onClick.AddListener(Load);
+        ClearButton.onClick.AddListener(ResetScene);
         SetMass(MassInputField.text);
         SetMethod(MethodDropDown.value);
         SetSideLength(SideLengthInputField.text);
@@ -161,6 +165,11 @@ public class UIManager : MonoBehaviour
             cloth.IsPlaying = isPlaying;
     }
 
+    public void ResetScene()
+    {
+        SceneManager.LoadScene(0);
+    }
+
     public void Save()
     {
         Dictionary<string, object> configure = new Dictionary<string, object>();
@@ -188,7 +197,7 @@ public class UIManager : MonoBehaviour
     {
         Dictionary<string, object> configure = new Dictionary<string, object>();
         string[] s = StandaloneFileBrowser.OpenFilePanel("讀取", Application.dataPath, "json", false);
-        if (s[0] == "")
+        if (s.Length == 0 || s[0] == "")
             return;
         using (StreamReader reader = new StreamReader(s[0]))
         {

@@ -8,8 +8,13 @@ public class SpringSystem
     public int ConnectIndexEnd;
     public float OriginLength;
 
-    private const float Ks = 500.0f;
-    private const float Kd = 1.5f;
+    public float RestLength;
+
+    public Matrix4x4 Jx = new Matrix4x4();
+    public Matrix4x4 Jv = new Matrix4x4();
+        
+    public const float Ks = 500.0f;
+    public const float Kd = 1.5f;
 
     public SpringSystem(int startIndex, int endIndex, float sideLength)
     {
@@ -18,6 +23,11 @@ public class SpringSystem
         ConnectIndexEnd = endIndex;
 
         OriginLength = sideLength;
+    }
+
+    public void UpdateLength(List<GameObject> particles)
+    {
+        RestLength = Vector3.Distance(particles[ConnectIndexStart].transform.position, particles[ConnectIndexEnd].transform.position);
     }
 
     public Vector3 CountForce(Vector3 startSpeed, Vector3 endSpeed, Vector3 startPos, Vector3 endPos)

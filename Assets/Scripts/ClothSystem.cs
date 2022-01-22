@@ -6,7 +6,8 @@ public enum ForceStatus
 {
     Euler = 0,
     RungeKutta2,
-    RungeKutta4
+    RungeKutta4,
+    Implicit
 }
 
 public class ClothSystem : MonoBehaviour
@@ -159,41 +160,59 @@ public class ClothSystem : MonoBehaviour
         // 固定點不動
         for (int i = 0; i < lockIndexes.Count; i++)
             speedArray[lockIndexes[i]] = Vector3.zero;
-        // 更新粒子資訊
-        for (int i = 0; i < SideCount; i++)
-        {
-            for (int j = 0; j < SideCount; j++)
-            {
-                int index = i * SideCount + j;
-                Vector3 result = Vector3.zero;
-                switch (ForceStatus)
-                {
-                    case ForceStatus.Euler:
-                        result = EulerMethod(index, Time.fixedDeltaTime);
-                        break;
-                    case ForceStatus.RungeKutta2:
-                        result = RungeKutta2(index, Time.fixedDeltaTime);
-                        break;
-                    case ForceStatus.RungeKutta4:
-                        result = RunguKutta4(index, Time.fixedDeltaTime);
-                        break;
-                    default:
-                        break;
-                }
-                // 碰撞
-                if (!Colliders[index].IsCollision)
-                {
-                    Vertexes[index] += result + userAppendForce[index];
-                }
-                Vector3[] linePnts = new Vector3[2];
-                linePnts[0] = Particles[index].transform.position;
-                linePnts[1] = (result + userAppendForce[index]) * 50f + linePnts[0];
-                forceLineRenderers[index].SetPositions(linePnts);
-                //else
-                //    Vertexes[index] = Colliders[index].HitPoint;
-                Particles[index].transform.position = Vertexes[index];
-                Particles[index].transform.GetComponent<LineRenderer>();
 
+        if (ForceStatus == ForceStatus.Implicit)
+        {
+            ComputeJacobians();
+            List<Vector3> results = new List<Vector3>();
+            MultiplyDfDx(Vertexes, ref results);
+            for (int i = 0;i < results.Count;i++)
+            {
+                Vertexes[i] = results[i];
+                Particles[i].transform.position = Vertexes[i];
+                springArray[i].UpdateLength(Particles);
+            }
+        }
+        else
+        {
+            // 更新粒子資訊
+            for (int i = 0; i < SideCount; i++)
+            {
+                for (int j = 0; j < SideCount; j++)
+                {
+                    int index = i * SideCount + j;
+                    Vector3 result = Vector3.zero;
+                    List<Vector3> results = new List<Vector3>();
+                    switch (ForceStatus)
+                    {
+                        case ForceStatus.Euler:
+                            result = EulerMethod(index, Time.fixedDeltaTime);
+                            break;
+                        case ForceStatus.RungeKutta2:
+                            result = RungeKutta2(index, Time.fixedDeltaTime);
+                            break;
+                        case ForceStatus.RungeKutta4:
+                            result = RunguKutta4(index, Time.fixedDeltaTime);
+                            break;
+                        case ForceStatus.Implicit:
+                            ComputeJacobians();
+                            MultiplyDfDx(Vertexes, ref results);
+                            break;
+                        default:
+                            break;
+                    }
+                    // 碰撞
+                    if (!Colliders[index].IsCollision)
+                        Vertexes[index] += result + userAppendForce[index];
+                    Vector3[] linePnts = new Vector3[2];
+                    linePnts[0] = Particles[index].transform.position;
+                    linePnts[1] = (result + userAppendForce[index]) * 50f + linePnts[0];
+                    forceLineRenderers[index].SetPositions(linePnts);
+
+                    // 給予位置
+                    Particles[index].transform.position = Vertexes[index];
+                    springArray[index].UpdateLength(Particles);
+                }
             }
         }
         meshFilter.mesh.vertices = Vertexes.ToArray();
@@ -408,7 +427,7 @@ public class ClothSystem : MonoBehaviour
 
     public void SetParticleVisibility(bool visible)
     {
-        foreach(GameObject particle in Particles)
+        foreach (GameObject particle in Particles)
         {
             particle.transform.GetChild(0).gameObject.SetActive(visible);
         }
@@ -440,6 +459,72 @@ public class ClothSystem : MonoBehaviour
             lockIndexes.Add(index);
         else
             lockIndexes.Remove(index);
+    }
+
+    private void ComputeJacobians()
+    {
+        for (int i = 0; i < springArray.Count; i++)
+        {
+            Vector3 dx = Particles[springArray[i].ConnectIndexStart].transform.position - Particles[springArray[i].ConnectIndexEnd].transform.position;
+            Matrix4x4 dxtdx = new Matrix4x4();
+            Matrix4x4 i3x3 = Matrix4x4.identity;
+            dxtdx = OuterProduct(dx, dx);
+            // TODO: 檢查是不是dot
+            float l = Mathf.Sqrt(Vector3.Dot(dx, dx));
+            if (l != 0)
+                l = 1.0f / l;
+            dxtdx.SetRow(0, dxtdx.GetRow(0) * l * l);
+            dxtdx.SetRow(1, dxtdx.GetRow(1) * l * l);
+            dxtdx.SetRow(2, dxtdx.GetRow(2) * l * l);
+            dxtdx.SetRow(3, dxtdx.GetRow(3) * l * l);
+
+            springArray[i].Jx = AddMatrix(dxtdx, MultipltyScalerMaxtrix(AddMatrix(i3x3, MultipltyScalerMaxtrix(dxtdx, -1)), 1 - springArray[i].RestLength * l));
+            springArray[i].Jx = MultipltyScalerMaxtrix(springArray[i].Jx, SpringSystem.Ks);
+            springArray[i].Jv = MultipltyScalerMaxtrix(Matrix4x4.identity, SpringSystem.Kd);
+        }
+    }
+
+    private void MultiplyDfDx(List<Vector3> v1, ref List<Vector3> v2)
+    {
+        v2.Clear();
+        for (int i = 0; i < Particles.Count; i++)
+            v2.Add(Vector3.zero);
+        for (int i = 0; i < springArray.Count; i++)
+        {
+            Vector3 temp = springArray[i].Jx.MultiplyVector(v1[springArray[i].ConnectIndexStart] - v1[springArray[i].ConnectIndexEnd]);
+            v2[springArray[i].ConnectIndexStart] -= temp;
+            v2[springArray[i].ConnectIndexEnd] += temp;
+        }
+    }
+
+    private Matrix4x4 OuterProduct(Vector3 v1, Vector3 v2)
+    {
+        Matrix4x4 matrix = new Matrix4x4();
+        matrix.SetRow(0, new Vector4(v1.x * v2.x, v1.x * v2.y, v1.x * v2.z, 0));
+        matrix.SetRow(1, new Vector4(v1.y * v2.x, v1.y * v2.y, v1.y * v2.z, 0));
+        matrix.SetRow(2, new Vector4(v1.z * v2.x, v1.z * v2.y, v1.z * v2.z, 0));
+        matrix.SetRow(3, Vector3.zero);
+        return matrix;
+    }
+
+    private Matrix4x4 MultipltyScalerMaxtrix(Matrix4x4 m, float scaler)
+    {
+        Matrix4x4 result = new Matrix4x4();
+        result.SetRow(0, m.GetRow(0) * scaler);
+        result.SetRow(1, m.GetRow(1) * scaler);
+        result.SetRow(2, m.GetRow(2) * scaler);
+        result.SetRow(3, m.GetRow(3) * scaler);
+        return result;
+    }
+
+    private Matrix4x4 AddMatrix(Matrix4x4 m1, Matrix4x4 m2)
+    {
+        Matrix4x4 m = new Matrix4x4();
+        m.SetRow(0, m1.GetRow(0) + m2.GetRow(0));
+        m.SetRow(1, m1.GetRow(1) + m2.GetRow(1));
+        m.SetRow(2, m1.GetRow(2) + m2.GetRow(2));
+        m.SetRow(3, m1.GetRow(3) + m2.GetRow(3));
+        return m;
     }
 
     private void OnDrawGizmos()

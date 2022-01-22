@@ -2384,6 +2384,7 @@ MonoBehaviour:
   PlayButton: {fileID: 5446940646431957592}
   SaveButton: {fileID: 9021645796528782992}
   LoadButton: {fileID: 5446940645874565268}
+  ClearButton: {fileID: 6056632994862866905}
 --- !u!1 &5446940646467578746
 GameObject:
   m_ObjectHideFlags: 0
@@ -2504,7 +2505,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5446940647096503538}
   m_HandleRect: {fileID: 5446940647096503539}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -3136,7 +3137,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5446940646747599569}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.61225885
+  m_Size: 0.6895094
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5514,6 +5515,14 @@ PrefabInstance:
     - target: {fileID: 4203177003469335244, guid: 87c260a8af9173b49aac50ccf4c9c910, type: 3}
       propertyPath: m_Name
       value: MethodDropdownItem
+      objectReference: {fileID: 0}
+    - target: {fileID: 5835792193284727214, guid: 87c260a8af9173b49aac50ccf4c9c910, type: 3}
+      propertyPath: m_Options.m_Options.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5835792193284727214, guid: 87c260a8af9173b49aac50ccf4c9c910, type: 3}
+      propertyPath: m_Options.m_Options.Array.data[3].m_Text
+      value: Implicit
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 87c260a8af9173b49aac50ccf4c9c910, type: 3}
