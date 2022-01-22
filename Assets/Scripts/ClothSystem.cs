@@ -350,6 +350,11 @@ public class ClothSystem : MonoBehaviour
         return k1 / 6.0f + k2 / 3.0f + k3 / 3.0f + k4 / 6.0f;
     }
 
+    public void ResetCloth()
+    {
+        
+    }
+
     private void OnDrawGizmos()
     {
         for (int i = 0; i < springArray.Count; i++)

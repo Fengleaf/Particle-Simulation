@@ -5,6 +5,8 @@ using UnityEngine.EventSystems;
 
 public class ControllPntManager : MonoBehaviour
 {
+    public static ControllPntManager Instance { get; private set; }
+    public GameObject NowClick { get; private set; }
     public GameObject pivot;
     public Plane clipPlane;
     private GameObject inGamePivot;
@@ -12,6 +14,7 @@ public class ControllPntManager : MonoBehaviour
     private GameObject selectedOb;
     public bool IsMoving { get; private set; }
     private pntController pntControllerID;
+
     private enum pntController
     {
         Pnt,
@@ -19,6 +22,12 @@ public class ControllPntManager : MonoBehaviour
         xzPlane,
         xyPlane
     };
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -48,6 +57,7 @@ public class ControllPntManager : MonoBehaviour
                         tmpInGamePivot = Instantiate(pivot, Vector3.zero, Quaternion.identity, objectHit);
                         tmpInGamePivot.transform.localPosition = Vector3.zero;
                         selectedOb = objectHit.gameObject;
+                        NowClick = selectedOb;
                     }
                 }
             } 
