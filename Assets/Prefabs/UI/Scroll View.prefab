@@ -2205,6 +2205,7 @@ MonoBehaviour:
   SpringVisibilityToggle: {fileID: 5951421845903780040}
   ParticleVisibilityToggle: {fileID: 3865166812953092382}
   TextureVisibilityToggle: {fileID: 7932513328593182781}
+  PlayButton: {fileID: 5446940646431957592}
 --- !u!1 &5446940646467578746
 GameObject:
   m_ObjectHideFlags: 0
@@ -2325,7 +2326,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5446940647096503538}
   m_HandleRect: {fileID: 5446940647096503539}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -3156,8 +3157,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5446940646747599568}
   m_HandleRect: {fileID: 5446940646747599569}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.3188094
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

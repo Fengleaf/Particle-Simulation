@@ -25,12 +25,16 @@ public class UIManager : MonoBehaviour
     public Toggle ParticleVisibilityToggle;
     public Toggle TextureVisibilityToggle;
 
+    public Button PlayButton;
+
     private float mass;
     private ForceStatus method;
 
     private int sideLength;
     private float space;
     private Vector3 initialPosition;
+
+    private bool isPlaying;
 
     private void Start()
     {
@@ -48,6 +52,7 @@ public class UIManager : MonoBehaviour
         SpringVisibilityToggle.onValueChanged.AddListener(SetSpringVisibility);
         ParticleVisibilityToggle.onValueChanged.AddListener(SetParticleVisibility);
         TextureVisibilityToggle.onValueChanged.AddListener(SetTextureVisibility);
+        PlayButton.onClick.AddListener(Play);
         SetMass(MassInputField.text);
         SetMethod(MethodDropDown.value);
         SetSideLength(SideLengthInputField.text);
@@ -133,5 +138,14 @@ public class UIManager : MonoBehaviour
         ClothSystem[] clothes = FindObjectsOfType<ClothSystem>();
         foreach (ClothSystem cloth in clothes)
             cloth.SetTextureVisibility(b);
+    }
+
+    public void Play()
+    {
+        isPlaying = !isPlaying;
+        PlayButton.GetComponentInChildren<Text>().text = isPlaying ? "Pause" : "Play";
+        ClothSystem[] clothes = FindObjectsOfType<ClothSystem>();
+        foreach (ClothSystem cloth in clothes)
+            cloth.IsPlaying = isPlaying;
     }
 }
