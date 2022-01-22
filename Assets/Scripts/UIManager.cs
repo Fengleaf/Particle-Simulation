@@ -116,7 +116,8 @@ public class UIManager : MonoBehaviour
 
     public void LockParticle()
     {
-
+        ClothSystem cloth = ControllPntManager.Instance.NowClick.transform.parent.GetComponent<ClothSystem>();
+        cloth.SetLockParticle(ControllPntManager.Instance.NowClick);
     }
 
     public void SetSpringVisibility(bool b)

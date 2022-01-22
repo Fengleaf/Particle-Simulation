@@ -49,6 +49,8 @@ public class ClothSystem : MonoBehaviour
     private MeshFilter meshFilter;
     private MeshRenderer meshRender;
 
+    private List<int> lockIndexes = new List<int>();
+
     private void Start()
     {
         // 加上 Component
@@ -154,9 +156,9 @@ public class ClothSystem : MonoBehaviour
                 speedArray[i] = Vector3.zero;
             }
         }
-        // 衣服上兩個點固定住
-        speedArray[SideCount * SideCount - 1] = Vector3.zero;
-        speedArray[SideCount - 1] = Vector3.zero;
+        // 固定點不動
+        for (int i = 0; i < lockIndexes.Count; i++)
+            speedArray[lockIndexes[i]] = Vector3.zero;
         // 更新粒子資訊
         for (int i = 0; i < SideCount; i++)
         {
@@ -281,7 +283,7 @@ public class ClothSystem : MonoBehaviour
     private Vector3 RungeKutta2(int index, float time)
     {
         // 固定的點不計算
-        if (index == SideCount - 1 || index == SideCount * SideCount - 1)
+        if (lockIndexes.Contains(index))
             return Vector3.zero;
         // K1
         Vector3 k1 = EulerMethod(index, time);
@@ -323,7 +325,7 @@ public class ClothSystem : MonoBehaviour
     private Vector3 RunguKutta4(int index, float time)
     {
         // 固定的點不計算
-        if (index == SideCount - 1 || index == SideCount * SideCount - 1)
+        if (lockIndexes.Contains(index))
             return Vector3.zero;
         // K1
         Vector3 k1 = EulerMethod(index, time);
@@ -427,6 +429,17 @@ public class ClothSystem : MonoBehaviour
     public void SetTextureVisibility(bool visible)
     {
         meshRender.enabled = visible;
+    }
+
+    public void SetLockParticle(GameObject particle)
+    {
+        int index = Particles.IndexOf(particle);
+        if (index == -1)
+            return;
+        if (!lockIndexes.Contains(index))
+            lockIndexes.Add(index);
+        else
+            lockIndexes.Remove(index);
     }
 
     private void OnDrawGizmos()

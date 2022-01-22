@@ -2203,7 +2203,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5446940647096503538}
   m_HandleRect: {fileID: 5446940647096503539}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2914,7 +2914,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5446940646747599569}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.6150513
+  m_Size: 0.7508565
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3121,13 +3121,13 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5446940647374464297}
   m_TextComponent: {fileID: 5446940646186909021}
   m_Placeholder: {fileID: 5446940646163538783}
-  m_ContentType: 0
+  m_ContentType: 3
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 0
+  m_KeyboardType: 2
   m_LineType: 0
   m_HideMobileInput: 0
-  m_CharacterValidation: 0
+  m_CharacterValidation: 2
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
