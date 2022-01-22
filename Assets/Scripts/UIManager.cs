@@ -22,6 +22,7 @@ public class UIManager : MonoBehaviour
     public Button DeleteButton;
 
     public Toggle SpringVisibilityToggle;
+    public Toggle ParticleVisibilityToggle;
     public Toggle TextureVisibilityToggle;
 
     private float mass;
@@ -44,6 +45,9 @@ public class UIManager : MonoBehaviour
         LockButton.onClick.AddListener(LockParticle);
         AddButton.onClick.AddListener(AddCloth);
         DeleteButton.onClick.AddListener(DeleteCloth);
+        SpringVisibilityToggle.onValueChanged.AddListener(SetSpringVisibility);
+        ParticleVisibilityToggle.onValueChanged.AddListener(SetParticleVisibility);
+        TextureVisibilityToggle.onValueChanged.AddListener(SetTextureVisibility);
         SetMass(MassInputField.text);
         SetMethod(MethodDropDown.value);
         SetSideLength(SideLengthInputField.text);
@@ -106,6 +110,23 @@ public class UIManager : MonoBehaviour
     }
 
     public void LockParticle()
+    {
+
+    }
+
+    public void SetSpringVisibility(bool b)
+    {
+        ClothSystem[] clothes = FindObjectsOfType<ClothSystem>();
+        foreach (ClothSystem cloth in clothes)
+            cloth.SetSpringVisibility(b);
+    }
+
+    public void SetParticleVisibility(bool b)
+    {
+
+    }
+
+    public void SetTextureVisibility(bool b)
     {
 
     }

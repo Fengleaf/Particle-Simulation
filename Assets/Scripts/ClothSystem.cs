@@ -36,6 +36,8 @@ public class ClothSystem : MonoBehaviour
     public Material structSpringMat;
     public Material bendSpringMat;
 
+    public bool IsPlaying;
+
     private List<SpringSystem> springArray = new List<SpringSystem>();
     private List<LineRenderer> lineRenderers = new List<LineRenderer>();
     private List<LineRenderer> forceLineRenderers = new List<LineRenderer>();
@@ -115,6 +117,9 @@ public class ClothSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!IsPlaying)
+            return;
+
         // 彈簧
         Vector3[] tempspeedArray = new Vector3[speedArray.Count];
         for (int i = 0; i < springArray.Count; i++)
@@ -397,6 +402,19 @@ public class ClothSystem : MonoBehaviour
 
         Vector3 k4 = EulerMethodWithAppendForce(index, time, appendSpeedK4);
         return k1 / 6.0f + k2 / 3.0f + k3 / 3.0f + k4 / 6.0f;
+    }
+
+    public void SetParticleVisibility(bool visible)
+    {
+        foreach(GameObject particle in Particles)
+        {
+            particle.transform.GetChild(0).gameObject.SetActive(visible);
+        }
+    }
+
+    public void SetSpringVisibility(bool visible)
+    {
+
     }
 
     private void OnDrawGizmos()
