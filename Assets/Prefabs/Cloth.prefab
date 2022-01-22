@@ -45,7 +45,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ParticlePrefab: {fileID: 7620823688251910297, guid: feecc670d8370784295a8b53f4c1f934, type: 3}
   SideCount: 10
-  InitialHeight: 1
+  InitialPosition: {x: 0, y: 0, z: 0}
   UnitDistance: 1
   Particles: []
   Colliders: []
@@ -55,5 +55,9 @@ MonoBehaviour:
   ForceStatus: 0
   Mass: 1
   Gravity: -9.81
+  lineRendererPrefab: {fileID: 4198558337568351853, guid: 3327d0d8f6eb2eb4ab2de3ef4674acb2, type: 3}
+  shearSpringMat: {fileID: 2100000, guid: 70622c1fcdd3f6f45836dc12a24f55a2, type: 2}
+  structSpringMat: {fileID: 2100000, guid: bd4ce37ff030c7242a7ebae8a1191f1d, type: 2}
+  bendSpringMat: {fileID: 2100000, guid: 1330bb4257d495e438c58c096794297c, type: 2}
   Texture: {fileID: 2800000, guid: 68cfec0cc6fa2f643a7d6383e46abe55, type: 3}
   TwoSideMat: {fileID: 2100000, guid: 2f03f8c1cbd076e40b647a1c95070fd6, type: 2}
