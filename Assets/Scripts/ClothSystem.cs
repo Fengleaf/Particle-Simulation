@@ -15,8 +15,8 @@ public class ClothSystem : MonoBehaviour
 
     // 邊有幾顆粒子
     public int SideCount = 10;
-    // 布料初始高度
-    public float InitialHeight = 5;
+    // 布料初始位置
+    public Vector3 InitialPosition = Vector3.zero;
     // 每顆粒子距離
     public float UnitDistance = 1;
 
@@ -64,7 +64,7 @@ public class ClothSystem : MonoBehaviour
             for (int j = 0; j < SideCount; j++)
             {
                 #region 產生粒子
-                Vector3 position = new Vector3(i * UnitDistance, InitialHeight, j * UnitDistance);
+                Vector3 position = new Vector3(i * UnitDistance + InitialPosition.x, InitialPosition.y, j * UnitDistance + InitialPosition.z);
                 Vertexes.Add(position);
                 GameObject particle = Instantiate(ParticlePrefab, position, Quaternion.identity, transform);
                 forceLineRenderers.Add(particle.transform.GetComponent<LineRenderer>());
@@ -397,11 +397,6 @@ public class ClothSystem : MonoBehaviour
 
         Vector3 k4 = EulerMethodWithAppendForce(index, time, appendSpeedK4);
         return k1 / 6.0f + k2 / 3.0f + k3 / 3.0f + k4 / 6.0f;
-    }
-
-    public void ResetCloth()
-    {
-        
     }
 
     private void OnDrawGizmos()

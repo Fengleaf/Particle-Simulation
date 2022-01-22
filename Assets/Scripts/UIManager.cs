@@ -8,12 +8,59 @@ public class UIManager : MonoBehaviour
 {
     public GameObject ClothPrefab;
 
+    public InputField MassInputField;
+    public Dropdown MethodDropDown;
+    public InputField SideLengthInputField;
+    public InputField SpacingInputField;
+    public InputField XInputField;
+    public InputField YInputField;
+    public InputField ZInputField;
+
+    public Button EditButton;
+    public Button LockButton;
+    public Button AddButton;
+    public Button DeleteButton;
+
+    public Toggle SpringVisibilityToggle;
+    public Toggle TextureVisibilityToggle;
+
     private float mass;
     private ForceStatus method;
+
+    private int sideLength;
+    private float space;
+    private Vector3 initialPosition;
+
+    private void Start()
+    {
+        MassInputField.onEndEdit.AddListener(SetMass);
+        MethodDropDown.onValueChanged.AddListener(SetMethod);
+        SideLengthInputField.onEndEdit.AddListener(SetSideLength);
+        SpacingInputField.onEndEdit.AddListener(SetSpacing);
+        XInputField.onEndEdit.AddListener(SetInitialX);
+        YInputField.onEndEdit.AddListener(SetInitialY);
+        ZInputField.onEndEdit.AddListener(SetInitialZ);
+        EditButton.onClick.AddListener(EditCloth);
+        LockButton.onClick.AddListener(LockParticle);
+        AddButton.onClick.AddListener(AddCloth);
+        DeleteButton.onClick.AddListener(DeleteCloth);
+        SetMass(MassInputField.text);
+        SetMethod(MethodDropDown.value);
+        SetSideLength(SideLengthInputField.text);
+        SetSpacing(SpacingInputField.text);
+        SetInitialX(XInputField.text);
+        SetInitialY(YInputField.text);
+        SetInitialZ(ZInputField.text);
+    }
 
     public void SetMass(string s)
     {
         mass = Convert.ToSingle(s);
+        if (mass == 0)
+        {
+            mass = 0.0001f;
+            MassInputField.text = "0.0001";
+        }
     }
 
     public void SetMethod(int i)
@@ -21,15 +68,45 @@ public class UIManager : MonoBehaviour
         method = (ForceStatus)i;
     }
 
+    public void SetInitialX(string x) => initialPosition.x = Convert.ToSingle(x);
+    public void SetInitialY(string y) => initialPosition.y = Convert.ToSingle(y);
+    public void SetInitialZ(string z) => initialPosition.z = Convert.ToSingle(z);
+
+    public void SetSideLength(string l)
+    {
+        sideLength = Convert.ToInt32(l);
+    }
+
+    public void SetSpacing(string s)
+    {
+        space = Convert.ToSingle(s);
+    }
+
     public void AddCloth()
     {
-        Instantiate(ClothPrefab);
+        ClothSystem cloth = Instantiate(ClothPrefab).GetComponent<ClothSystem>();
+        cloth.Mass = mass;
+        cloth.ForceStatus = method;
+        cloth.SideCount = sideLength;
+        cloth.UnitDistance = space;
+        cloth.InitialPosition = initialPosition;
+    }
+
+    public void DeleteCloth()
+    {
+        ClothSystem cloth = ControllPntManager.Instance.NowClick.transform.parent.GetComponent<ClothSystem>();
+        Destroy(cloth.gameObject);
     }
 
     public void EditCloth()
     {
-        ClothSystem cloth = ControllPntManager.Instance.NowClick.GetComponent<ClothSystem>();
+        ClothSystem cloth = ControllPntManager.Instance.NowClick.transform.parent.GetComponent<ClothSystem>();
         cloth.Mass = mass;
         cloth.ForceStatus = method;
+    }
+
+    public void LockParticle()
+    {
+
     }
 }
