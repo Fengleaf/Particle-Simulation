@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Newtonsoft.Json;
+using System.IO;
+using SFB;
 
 public class UIManager : MonoBehaviour
 {
@@ -26,10 +29,11 @@ public class UIManager : MonoBehaviour
     public Toggle TextureVisibilityToggle;
 
     public Button PlayButton;
+    public Button SaveButton;
+    public Button LoadButton;
 
     private float mass;
     private ForceStatus method;
-
     private int sideLength;
     private float space;
     private Vector3 initialPosition;
@@ -53,6 +57,8 @@ public class UIManager : MonoBehaviour
         ParticleVisibilityToggle.onValueChanged.AddListener(SetParticleVisibility);
         TextureVisibilityToggle.onValueChanged.AddListener(SetTextureVisibility);
         PlayButton.onClick.AddListener(Play);
+        SaveButton.onClick.AddListener(Save);
+        LoadButton.onClick.AddListener(Load);
         SetMass(MassInputField.text);
         SetMethod(MethodDropDown.value);
         SetSideLength(SideLengthInputField.text);
@@ -89,6 +95,11 @@ public class UIManager : MonoBehaviour
     public void SetSpacing(string s)
     {
         space = Convert.ToSingle(s);
+        if (space == 0)
+        {
+            space = 0.1f;
+            SpacingInputField.text = "0.1";
+        }
     }
 
     public void AddCloth()
@@ -148,5 +159,55 @@ public class UIManager : MonoBehaviour
         ClothSystem[] clothes = FindObjectsOfType<ClothSystem>();
         foreach (ClothSystem cloth in clothes)
             cloth.IsPlaying = isPlaying;
+    }
+
+    public void Save()
+    {
+        Dictionary<string, object> configure = new Dictionary<string, object>();
+        configure["Mass"] = mass;
+        configure["Method"] = method;
+        configure["SideLength"] = sideLength;
+        configure["Space"] = space;
+        configure["X"] = initialPosition.x;
+        configure["Y"] = initialPosition.y;
+        configure["Z"] = initialPosition.z;
+        string json = JsonConvert.SerializeObject(configure, new JsonSerializerSettings()
+        {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        });
+        string s = StandaloneFileBrowser.SaveFilePanel("儲存", Application.dataPath, "setting", "json");
+        if (string.IsNullOrEmpty(s))
+            return;
+        using (StreamWriter write = new StreamWriter(s))
+        {
+            write.WriteLine(json);
+        }
+    }
+
+    public void Load()
+    {
+        Dictionary<string, object> configure = new Dictionary<string, object>();
+        string[] s = StandaloneFileBrowser.OpenFilePanel("讀取", Application.dataPath, "json", false);
+        if (s[0] == "")
+            return;
+        using (StreamReader reader = new StreamReader(s[0]))
+        {
+            string file = reader.ReadToEnd();
+            configure = JsonConvert.DeserializeObject<Dictionary<string, object>>(file);
+            mass = Convert.ToSingle(configure["Mass"]);
+            method = (ForceStatus)(Convert.ToInt32(configure["Method"]));
+            sideLength = Convert.ToInt32(configure["SideLength"]);
+            space = Convert.ToSingle(configure["Space"]);
+            initialPosition.x = Convert.ToSingle(configure["X"]);
+            initialPosition.y = Convert.ToSingle(configure["Y"]);
+            initialPosition.z = Convert.ToSingle(configure["Z"]);
+            MassInputField.text = mass.ToString();
+            MethodDropDown.value = (int)method;
+            SideLengthInputField.text = sideLength.ToString();
+            SpacingInputField.text = space.ToString();
+            XInputField.text = initialPosition.x.ToString();
+            YInputField.text = initialPosition.y.ToString();
+            ZInputField.text = initialPosition.z.ToString();
+        }
     }
 }

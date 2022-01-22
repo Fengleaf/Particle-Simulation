@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum ForceStatus
 {
-    Euler,
+    Euler = 0,
     RungeKutta2,
     RungeKutta4
 }
