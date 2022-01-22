@@ -1358,6 +1358,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 410555522997218809, guid: 9a2a937b9d65b0348953b40a25c74bc1, type: 3}
+      propertyPath: Texture
+      value: 
+      objectReference: {fileID: 2800000, guid: 89d4a024eddb7b44c9e03cdb2ecb7850, type: 3}
+    - target: {fileID: 410555522997218809, guid: 9a2a937b9d65b0348953b40a25c74bc1, type: 3}
       propertyPath: InitialPosition.y
       value: 5
       objectReference: {fileID: 0}
