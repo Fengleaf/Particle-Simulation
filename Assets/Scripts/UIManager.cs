@@ -123,11 +123,15 @@ public class UIManager : MonoBehaviour
 
     public void SetParticleVisibility(bool b)
     {
-
+        ClothSystem[] clothes = FindObjectsOfType<ClothSystem>();
+        foreach (ClothSystem cloth in clothes)
+            cloth.SetParticleVisibility(b);
     }
 
     public void SetTextureVisibility(bool b)
     {
-
+        ClothSystem[] clothes = FindObjectsOfType<ClothSystem>();
+        foreach (ClothSystem cloth in clothes)
+            cloth.SetTextureVisibility(b);
     }
 }

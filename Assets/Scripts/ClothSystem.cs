@@ -417,6 +417,11 @@ public class ClothSystem : MonoBehaviour
 
     }
 
+    public void SetTextureVisibility(bool visible)
+    {
+        meshRender.enabled = visible;
+    }
+
     private void OnDrawGizmos()
     {
         for (int i = 0; i < springArray.Count; i++)
