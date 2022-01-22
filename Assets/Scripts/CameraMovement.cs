@@ -14,7 +14,7 @@ public enum FollowState
 
 public class CameraMovement : MonoBehaviour
 {
-    public float speed = 5.0f;
+    public float speed = 20.0f;
 
     // 相機旋轉
     private Vector2 cameraRotation;
@@ -54,8 +54,8 @@ public class CameraMovement : MonoBehaviour
         }
         if (Input.GetMouseButton(2))
         {
-            transform.position -= transform.right * mouseX * speed;
-            transform.position -= transform.up * mouseY * speed;
+            transform.position -= transform.right * mouseX * speed * 0.1f;
+            transform.position -= transform.up * mouseY * speed * 0.1f;
             state = FollowState.None;
         }
         if (Input.GetMouseButton(1) && !controllPntManager.IsMoving)
