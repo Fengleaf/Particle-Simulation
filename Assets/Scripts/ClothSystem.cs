@@ -414,7 +414,14 @@ public class ClothSystem : MonoBehaviour
 
     public void SetSpringVisibility(bool visible)
     {
-
+        for (int i = 0; i < lineRenderers.Count; i++)
+        {
+            lineRenderers[i].enabled = visible;
+        }
+        for (int i = 0; i < forceLineRenderers.Count; i++)
+        {
+            forceLineRenderers[i].enabled = visible;
+        }
     }
 
     public void SetTextureVisibility(bool visible)
