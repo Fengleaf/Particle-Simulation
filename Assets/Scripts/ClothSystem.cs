@@ -33,6 +33,7 @@ public class ClothSystem : MonoBehaviour
 
     private List<SpringSystem> springArray = new List<SpringSystem>();
     private List<Vector3> speedArray = new List<Vector3>();
+    private List<Vector3> userAppendForce = new List<Vector3>();
 
     public Texture Texture;
     public Material TwoSideMat;
@@ -59,12 +60,10 @@ public class ClothSystem : MonoBehaviour
                 Vector3 position = new Vector3(i * UnitDistance, InitialHeight, j * UnitDistance);
                 Vertexes.Add(position);
                 GameObject particle = Instantiate(ParticlePrefab, position, Quaternion.identity, transform);
-                //GameObject particle = new GameObject();
                 particle.name = $"Particle {i} * {j}";
-                //particle.transform.position = position;
-                //particle.transform.parent = transform;
                 Particles.Add(particle);
-                Colliders.Add(particle.AddComponent<Collider>());
+                Colliders.Add(particle.GetComponent<Collider>());
+                userAppendForce.Add(Vector3.zero);
                 #endregion
                 #region UV
                 float u = (float)i / (SideCount - 1);
@@ -128,18 +127,18 @@ public class ClothSystem : MonoBehaviour
             tempspeedArray[startIndex] += tempForce / Mass * Time.fixedDeltaTime;
             tempspeedArray[endIndex] -= tempForce / Mass * Time.fixedDeltaTime;
         }
+
         // 存入 speedArray
         for (int i = 0; i < speedArray.Count; i++)
         {
             speedArray[i] += tempspeedArray[i];
+            CheckUserAppendForce(i);
             // 重力
             speedArray[i] += Vector3.up * Gravity * Time.fixedDeltaTime;
             // 碰撞檢測
             if (Colliders[i].RayCast(speedArray[i]))
             {
                 speedArray[i] = Vector3.zero;
-                //speedArray[i] *= -1;
-                //speedArray[i] += Colliders[i].RelativeVector;
             }
         }
         // 衣服上兩個點固定住
@@ -168,13 +167,20 @@ public class ClothSystem : MonoBehaviour
                 }
                 // 碰撞
                 if (!Colliders[index].IsCollision)
-                    Vertexes[index] += result;
+                {
+                    Vertexes[index] += result + userAppendForce[index];
+                }
                 //else
                 //    Vertexes[index] = Colliders[index].HitPoint;
                 Particles[index].transform.position = Vertexes[index];
             }
         }
         meshFilter.mesh.vertices = Vertexes.ToArray();
+    }
+
+    private void CheckUserAppendForce(int index)
+    {
+        userAppendForce[index] = Particles[index].transform.position - Vertexes[index];
     }
 
     private void AddSpringWithIndex(int index)

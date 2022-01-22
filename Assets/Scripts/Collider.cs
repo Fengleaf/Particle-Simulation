@@ -13,7 +13,7 @@ public class Collider : MonoBehaviour
         bool collision = Physics.Raycast(ray, out RaycastHit hit, 0.3f);
         if (collision)
         {
-            if (hit.collider.CompareTag("Obstacle"))
+            if (hit.collider.CompareTag("Obstacle") || hit.collider.CompareTag("Particle"))
             {
                 RelativeVector = transform.position - hit.collider.transform.position;
                 HitPoint = hit.collider.ClosestPoint(transform.position);

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpringSystem : MonoBehaviour
+public class SpringSystem
 {
     public int ConnectIndexStart;
     public int ConnectIndexEnd;
