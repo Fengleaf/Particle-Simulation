@@ -7,6 +7,14 @@ public class Collider : MonoBehaviour
     public bool IsCollision = false;
     public Vector3 RelativeVector;
     public Vector3 HitPoint;
+    private LineRenderer lineRenderer;
+    private Vector3[] linePnts = new Vector3[2];
+
+    private void Start()
+    {
+        lineRenderer = GetComponent<LineRenderer>();
+    }
+
     public bool RayCast(Vector3 forward)
     {
         Ray ray = new Ray(transform.position, forward);
@@ -26,6 +34,9 @@ public class Collider : MonoBehaviour
         {
             IsCollision = false;
         }
+        //linePnts[0] = transform.parent.position;
+        //linePnts[1] = (forward - linePnts[0]) * 0.01f;
+        //lineRenderer.SetPositions(linePnts);
         return IsCollision;
     }
 }

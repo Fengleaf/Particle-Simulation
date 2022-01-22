@@ -38,6 +38,7 @@ public class ClothSystem : MonoBehaviour
 
     private List<SpringSystem> springArray = new List<SpringSystem>();
     private List<LineRenderer> lineRenderers = new List<LineRenderer>();
+    private List<LineRenderer> forceLineRenderers = new List<LineRenderer>();
     private List<Vector3> speedArray = new List<Vector3>();
     private List<Vector3> userAppendForce = new List<Vector3>();
 
@@ -66,6 +67,7 @@ public class ClothSystem : MonoBehaviour
                 Vector3 position = new Vector3(i * UnitDistance, InitialHeight, j * UnitDistance);
                 Vertexes.Add(position);
                 GameObject particle = Instantiate(ParticlePrefab, position, Quaternion.identity, transform);
+                forceLineRenderers.Add(particle.transform.GetComponent<LineRenderer>());
                 particle.name = $"Particle {i} * {j}";
                 Particles.Add(particle);
                 Colliders.Add(particle.GetComponent<Collider>());
@@ -176,9 +178,15 @@ public class ClothSystem : MonoBehaviour
                 {
                     Vertexes[index] += result + userAppendForce[index];
                 }
+                Vector3[] linePnts = new Vector3[2];
+                linePnts[0] = Particles[index].transform.position;
+                linePnts[1] = (result + userAppendForce[index]) * 50f + linePnts[0];
+                forceLineRenderers[index].SetPositions(linePnts);
                 //else
                 //    Vertexes[index] = Colliders[index].HitPoint;
                 Particles[index].transform.position = Vertexes[index];
+                Particles[index].transform.GetComponent<LineRenderer>();
+
             }
         }
         meshFilter.mesh.vertices = Vertexes.ToArray();
