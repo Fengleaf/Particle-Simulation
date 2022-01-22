@@ -31,7 +31,13 @@ public class ClothSystem : MonoBehaviour
     public float Mass = 1;
     public float Gravity = -9.81f;
 
+    public GameObject lineRendererPrefab;
+    public Material shearSpringMat;
+    public Material structSpringMat;
+    public Material bendSpringMat;
+
     private List<SpringSystem> springArray = new List<SpringSystem>();
+    private List<LineRenderer> lineRenderers = new List<LineRenderer>();
     private List<Vector3> speedArray = new List<Vector3>();
     private List<Vector3> userAppendForce = new List<Vector3>();
 
@@ -74,7 +80,7 @@ public class ClothSystem : MonoBehaviour
                 speedArray.Add(Vector3.zero);
                 #endregion
                 #region 每個點連接彈簧
-                AddSpringWithIndex(i * SideCount + j);
+                AddSpringWithIndex(i * SideCount + j, particle);
                 #endregion
             }
         }
@@ -176,6 +182,23 @@ public class ClothSystem : MonoBehaviour
             }
         }
         meshFilter.mesh.vertices = Vertexes.ToArray();
+        for (int i = 0; i < springArray.Count; i++)
+        {
+            int startIndex = springArray[i].ConnectIndexStart;
+            int endIndex = springArray[i].ConnectIndexEnd;
+            Vector3[] linePnts = new Vector3[2];
+            linePnts[0] = Particles[startIndex].transform.position;
+            linePnts[1] = Particles[endIndex].transform.position;
+            lineRenderers[i].SetPositions(linePnts);
+        }
+    }
+
+    private void NewLineRenderer(GameObject parent, Material mat)
+    {
+        GameObject lineRendererOb = Instantiate(lineRendererPrefab, parent.transform);
+        LineRenderer aLineRenderer = lineRendererOb.GetComponent<LineRenderer>();
+        aLineRenderer.material = mat;
+        lineRenderers.Add(aLineRenderer);
     }
 
     private void CheckUserAppendForce(int index)
@@ -183,7 +206,7 @@ public class ClothSystem : MonoBehaviour
         userAppendForce[index] = Particles[index].transform.position - Vertexes[index];
     }
 
-    private void AddSpringWithIndex(int index)
+    private void AddSpringWithIndex(int index, GameObject parent)
     {
         int NextIndex;
         // Structural Springs
@@ -191,30 +214,48 @@ public class ClothSystem : MonoBehaviour
         NextIndex = index + 1;
         // 確保在同一行
         if (NextIndex / SideCount == index / SideCount)
+        {
             springArray.Add(new SpringSystem(index, NextIndex, UnitDistance));
+            NewLineRenderer(parent, structSpringMat);
+        }
         // 向右
         NextIndex = index + SideCount;
         if (NextIndex / SideCount < SideCount)
+        {
             springArray.Add(new SpringSystem(index, NextIndex, UnitDistance));
+            NewLineRenderer(parent, structSpringMat);
+        }
         // Shear Springs
         // 右上
         NextIndex = index + SideCount + 1;
         // 避免超出邊界且要在隔壁
         if (NextIndex / SideCount < SideCount && NextIndex / SideCount == index / SideCount + 1)
+        {
             springArray.Add(new SpringSystem(index, NextIndex, UnitDistance * Mathf.Sqrt(2)));
+            NewLineRenderer(parent, shearSpringMat);
+        }
         // 左上
         NextIndex = index - SideCount + 1;
         if (NextIndex > 0 && NextIndex / SideCount < SideCount && NextIndex / SideCount == index / SideCount - 1)
+        {
             springArray.Add(new SpringSystem(index, NextIndex, UnitDistance * Mathf.Sqrt(2)));
+            NewLineRenderer(parent, shearSpringMat);
+        }
         // Bending Springs
         // 向上
         NextIndex = index + 2;
         if (NextIndex < SideCount)
+        {
             springArray.Add(new SpringSystem(index, NextIndex, UnitDistance * 2));
+            NewLineRenderer(parent, bendSpringMat);
+        }
         // 向右
         NextIndex = index + SideCount * 2;
         if (NextIndex / SideCount < SideCount)
+        {
             springArray.Add(new SpringSystem(index, NextIndex, UnitDistance * 2));
+            NewLineRenderer(parent, bendSpringMat);
+        }
     }
 
     // 一般的 Euler 方法
