@@ -168,7 +168,7 @@ public class ClothSystem : MonoBehaviour
             ComputeJacobians();
             List<Vector3> results = new List<Vector3>();
             MultiplyDfDx(Vertexes, ref results);
-            for (int i = 0;i < results.Count;i++)
+            for (int i = 0; i < results.Count; i++)
             {
                 Vertexes[i] = results[i];
                 Particles[i].transform.position = Vertexes[i];
@@ -213,8 +213,8 @@ public class ClothSystem : MonoBehaviour
                 }
             }
         }
-        for (int w = 0; w < wallAppendForce.Count; w++)
-            wallAppendForce[w] = Vector3.zero;
+        //for (int w = 0; w < wallAppendForce.Count; w++)
+        //    wallAppendForce[w] = Vector3.zero;
         meshFilter.mesh.vertices = Vertexes.ToArray();
         for (int i = 0; i < springArray.Count; i++)
         {

@@ -464,13 +464,13 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1014419265467709731}
   m_TextComponent: {fileID: 1014419267004205870}
   m_Placeholder: {fileID: 1014419267026546599}
-  m_ContentType: 0
+  m_ContentType: 3
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 0
+  m_KeyboardType: 2
   m_LineType: 0
   m_HideMobileInput: 0
-  m_CharacterValidation: 0
+  m_CharacterValidation: 2
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
@@ -1283,13 +1283,13 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 103592828426390831}
   m_TextComponent: {fileID: 751876904995912719}
   m_Placeholder: {fileID: 7819141886858885007}
-  m_ContentType: 0
+  m_ContentType: 3
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 0
+  m_KeyboardType: 2
   m_LineType: 0
   m_HideMobileInput: 0
-  m_CharacterValidation: 0
+  m_CharacterValidation: 2
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
@@ -1505,13 +1505,13 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3673325213554943036}
   m_TextComponent: {fileID: 3099031225610839565}
   m_Placeholder: {fileID: 8220089151980230293}
-  m_ContentType: 0
+  m_ContentType: 3
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 0
+  m_KeyboardType: 2
   m_LineType: 0
   m_HideMobileInput: 0
-  m_CharacterValidation: 0
+  m_CharacterValidation: 2
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
@@ -2505,7 +2505,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5446940647096503538}
   m_HandleRect: {fileID: 5446940647096503539}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -3137,7 +3137,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5446940646747599569}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.6895094
+  m_Size: 0.272
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3797,13 +3797,13 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5149074696408411114}
   m_TextComponent: {fileID: 8792934067262870124}
   m_Placeholder: {fileID: 6019320888921988020}
-  m_ContentType: 0
+  m_ContentType: 3
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 0
+  m_KeyboardType: 2
   m_LineType: 0
   m_HideMobileInput: 0
-  m_CharacterValidation: 0
+  m_CharacterValidation: 2
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
@@ -5404,6 +5404,18 @@ PrefabInstance:
       propertyPath: m_Text
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7679429913414161239, guid: cd07edf7ceeb9a94ca44a50bb34708e0, type: 3}
+      propertyPath: m_ContentType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7679429913414161239, guid: cd07edf7ceeb9a94ca44a50bb34708e0, type: 3}
+      propertyPath: m_KeyboardType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7679429913414161239, guid: cd07edf7ceeb9a94ca44a50bb34708e0, type: 3}
+      propertyPath: m_CharacterValidation
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7679429914949689693, guid: cd07edf7ceeb9a94ca44a50bb34708e0, type: 3}
       propertyPath: m_Text
       value: 1
@@ -5518,7 +5530,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5835792193284727214, guid: 87c260a8af9173b49aac50ccf4c9c910, type: 3}
       propertyPath: m_Options.m_Options.Array.size
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5835792193284727214, guid: 87c260a8af9173b49aac50ccf4c9c910, type: 3}
       propertyPath: m_Options.m_Options.Array.data[3].m_Text

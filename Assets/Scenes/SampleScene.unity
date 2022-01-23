@@ -812,6 +812,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5446940647096503539, guid: 8b10d0dc9fd561d46b9165f77804c7c8, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5446940647271746389, guid: 8b10d0dc9fd561d46b9165f77804c7c8, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -933,6 +937,22 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7039387830692136077, guid: 8b10d0dc9fd561d46b9165f77804c7c8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7090573297072441155, guid: 8b10d0dc9fd561d46b9165f77804c7c8, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7090573297072441155, guid: 8b10d0dc9fd561d46b9165f77804c7c8, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7090573297072441155, guid: 8b10d0dc9fd561d46b9165f77804c7c8, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7090573297072441155, guid: 8b10d0dc9fd561d46b9165f77804c7c8, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
@@ -1062,6 +1082,7 @@ GameObject:
   - component: {fileID: 1427414462}
   - component: {fileID: 1427414461}
   - component: {fileID: 1427414460}
+  - component: {fileID: 1427414464}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Obstacle
@@ -1145,6 +1166,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1427414464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1427414459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b48d2b6174d4ec94491d14d17a70e1ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1618497696
 GameObject:
   m_ObjectHideFlags: 0
@@ -1223,6 +1256,7 @@ GameObject:
   - component: {fileID: 1755699038}
   - component: {fileID: 1755699037}
   - component: {fileID: 1755699036}
+  - component: {fileID: 1755699040}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Obstacle
@@ -1306,6 +1340,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1755699040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1755699035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b48d2b6174d4ec94491d14d17a70e1ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &5311780958541685255
 PrefabInstance:
   m_ObjectHideFlags: 0
