@@ -22,7 +22,7 @@ public class ClothSystem : MonoBehaviour
     public float UnitDistance = 1;
 
     public List<GameObject> Particles = new List<GameObject>();
-    public List<Collider> Colliders = new List<Collider>();
+    public List<ParticleCollider> Colliders = new List<ParticleCollider>();
     public List<Vector3> Vertexes = new List<Vector3>();
     public List<Vector2> UVs = new List<Vector2>();
     public List<int> TrianglesIndexes = new List<int>();
@@ -44,6 +44,7 @@ public class ClothSystem : MonoBehaviour
     private List<LineRenderer> forceLineRenderers = new List<LineRenderer>();
     private List<Vector3> speedArray = new List<Vector3>();
     private List<Vector3> userAppendForce = new List<Vector3>();
+    private List<Vector3> wallAppendForce = new List<Vector3>();
 
     public Texture Texture;
     public Material TwoSideMat;
@@ -75,8 +76,9 @@ public class ClothSystem : MonoBehaviour
                 forceLineRenderers.Add(particle.transform.GetComponent<LineRenderer>());
                 particle.name = $"Particle {i} * {j}";
                 Particles.Add(particle);
-                Colliders.Add(particle.GetComponent<Collider>());
+                Colliders.Add(particle.GetComponent<ParticleCollider>());
                 userAppendForce.Add(Vector3.zero);
+                wallAppendForce.Add(Vector3.zero);
                 #endregion
                 #region UV
                 float u = (float)i / (SideCount - 1);
@@ -194,19 +196,15 @@ public class ClothSystem : MonoBehaviour
                         case ForceStatus.RungeKutta4:
                             result = RunguKutta4(index, Time.fixedDeltaTime);
                             break;
-                        case ForceStatus.Implicit:
-                            ComputeJacobians();
-                            MultiplyDfDx(Vertexes, ref results);
-                            break;
                         default:
                             break;
                     }
                     // 碰撞
                     if (!Colliders[index].IsCollision)
-                        Vertexes[index] += result + userAppendForce[index];
+                        Vertexes[index] += result + userAppendForce[index] + wallAppendForce[index];
                     Vector3[] linePnts = new Vector3[2];
                     linePnts[0] = Particles[index].transform.position;
-                    linePnts[1] = (result + userAppendForce[index]) * 50f + linePnts[0];
+                    linePnts[1] = (result + userAppendForce[index] + wallAppendForce[index]) * 50f + linePnts[0];
                     forceLineRenderers[index].SetPositions(linePnts);
 
                     // 給予位置
@@ -215,6 +213,8 @@ public class ClothSystem : MonoBehaviour
                 }
             }
         }
+        for (int w = 0; w < wallAppendForce.Count; w++)
+            wallAppendForce[w] = Vector3.zero;
         meshFilter.mesh.vertices = Vertexes.ToArray();
         for (int i = 0; i < springArray.Count; i++)
         {
@@ -238,6 +238,12 @@ public class ClothSystem : MonoBehaviour
     private void CheckUserAppendForce(int index)
     {
         userAppendForce[index] = Particles[index].transform.position - Vertexes[index];
+    }
+
+    public void AppendWallCollisionForce(GameObject particle, Vector3 forward)
+    {
+        int index = Particles.IndexOf(particle);
+        wallAppendForce[index] = forward;
     }
 
     private void AddSpringWithIndex(int index, GameObject parent)

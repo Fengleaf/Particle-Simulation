@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Collider : MonoBehaviour
+public class ParticleCollider : MonoBehaviour
 {
     public bool IsCollision = false;
     public Vector3 RelativeVector;
@@ -18,7 +18,7 @@ public class Collider : MonoBehaviour
     public bool RayCast(Vector3 forward)
     {
         Ray ray = new Ray(transform.position, forward);
-        bool collision = Physics.Raycast(ray, out RaycastHit hit, 0.3f);
+        bool collision = Physics.Raycast(ray, out RaycastHit hit, 0.5f);
         if (collision)
         {
             if (hit.collider.CompareTag("Obstacle") || hit.collider.CompareTag("Particle"))
