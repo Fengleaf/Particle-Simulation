@@ -7,7 +7,6 @@ public enum ForceStatus
     Euler = 0,
     RungeKutta2,
     RungeKutta4,
-    Implicit
 }
 
 public class ClothSystem : MonoBehaviour
@@ -163,20 +162,20 @@ public class ClothSystem : MonoBehaviour
         for (int i = 0; i < lockIndexes.Count; i++)
             speedArray[lockIndexes[i]] = Vector3.zero;
 
-        if (ForceStatus == ForceStatus.Implicit)
-        {
-            ComputeJacobians();
-            List<Vector3> results = new List<Vector3>();
-            MultiplyDfDx(Vertexes, ref results);
-            for (int i = 0; i < results.Count; i++)
-            {
-                Vertexes[i] = results[i];
-                Particles[i].transform.position = Vertexes[i];
-                springArray[i].UpdateLength(Particles);
-            }
-        }
-        else
-        {
+        //if (ForceStatus == ForceStatus.Implicit)
+        //{
+        //    ComputeJacobians();
+        //    List<Vector3> results = new List<Vector3>();
+        //    MultiplyDfDx(Vertexes, ref results);
+        //    for (int i = 0; i < results.Count; i++)
+        //    {
+        //        Vertexes[i] = results[i];
+        //        Particles[i].transform.position = Vertexes[i];
+        //        springArray[i].UpdateLength(Particles);
+        //    }
+        //}
+        //else
+        //{
             // 更新粒子資訊
             for (int i = 0; i < SideCount; i++)
             {
@@ -212,7 +211,7 @@ public class ClothSystem : MonoBehaviour
                     springArray[index].UpdateLength(Particles);
                 }
             }
-        }
+        //}
         //for (int w = 0; w < wallAppendForce.Count; w++)
         //    wallAppendForce[w] = Vector3.zero;
         meshFilter.mesh.vertices = Vertexes.ToArray();
