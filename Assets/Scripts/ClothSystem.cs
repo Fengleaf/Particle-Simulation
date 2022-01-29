@@ -30,6 +30,7 @@ public class ClothSystem : MonoBehaviour
 
     public float Mass = 1;
     public float Gravity = -9.81f;
+    public float TimeStep = 0.02f;
 
     public GameObject lineRendererPrefab;
     public Material shearSpringMat;
@@ -141,8 +142,8 @@ public class ClothSystem : MonoBehaviour
 
             Vector3 tempForce = springArray[i].CountForce(startSpeed, endSpeed, startPos, endPos);
             // 彈簧拉扯，對起始粒子來說是正向，對終點粒子來說是負向
-            tempspeedArray[startIndex] += tempForce / Mass * Time.fixedDeltaTime;
-            tempspeedArray[endIndex] -= tempForce / Mass * Time.fixedDeltaTime;
+            tempspeedArray[startIndex] += tempForce / Mass * TimeStep;
+            tempspeedArray[endIndex] -= tempForce / Mass * TimeStep;
         }
 
         // 存入 speedArray
@@ -151,7 +152,7 @@ public class ClothSystem : MonoBehaviour
             speedArray[i] += tempspeedArray[i];
             CheckUserAppendForce(i);
             // 重力
-            speedArray[i] += Vector3.up * Gravity * Time.fixedDeltaTime;
+            speedArray[i] += Vector3.up * Gravity * TimeStep;
             // 碰撞檢測
             if (Colliders[i].RayCast(speedArray[i]))
             {
@@ -187,13 +188,13 @@ public class ClothSystem : MonoBehaviour
                     switch (ForceStatus)
                     {
                         case ForceStatus.Euler:
-                            result = EulerMethod(index, Time.fixedDeltaTime);
+                            result = EulerMethod(index, TimeStep);
                             break;
                         case ForceStatus.RungeKutta2:
-                            result = RungeKutta2(index, Time.fixedDeltaTime);
+                            result = RungeKutta2(index, TimeStep);
                             break;
                         case ForceStatus.RungeKutta4:
-                            result = RunguKutta4(index, Time.fixedDeltaTime);
+                            result = RunguKutta4(index, TimeStep);
                             break;
                         default:
                             break;
@@ -313,7 +314,7 @@ public class ClothSystem : MonoBehaviour
         Vector3 k1 = EulerMethod(index, time);
         // K2
         // V = a t
-        Vector3 appendSpeedK2 = Vector3.up * Gravity * Time.deltaTime / 2;
+        Vector3 appendSpeedK2 = Vector3.up * Gravity * TimeStep / 2;
         for (int i = 0; i < springArray.Count; i++)
         {
             if (springArray[i].ConnectIndexStart == index || springArray[i].ConnectIndexEnd == index)
@@ -331,9 +332,9 @@ public class ClothSystem : MonoBehaviour
                 Vector3 tempForce = springArray[i].CountForce(StartSpeed, EndSpeed, StartPos, EndPos);
 
                 if (index == springArray[i].ConnectIndexStart)
-                    appendSpeedK2 += tempForce / Mass * Time.fixedDeltaTime;
+                    appendSpeedK2 += tempForce / Mass * TimeStep;
                 else
-                    appendSpeedK2 -= tempForce / Mass * Time.fixedDeltaTime;
+                    appendSpeedK2 -= tempForce / Mass * TimeStep;
             }
         }
         Vector3 k2 = EulerMethodWithAppendForce(index, time / 2, appendSpeedK2);
@@ -354,7 +355,7 @@ public class ClothSystem : MonoBehaviour
         // K1
         Vector3 k1 = EulerMethod(index, time);
         // K2
-        Vector3 appendSpeedK2 = Vector3.up * Gravity * Time.deltaTime / 2;
+        Vector3 appendSpeedK2 = Vector3.up * Gravity * TimeStep / 2;
         for (int i = 0; i < springArray.Count; i++)
         {
             if (springArray[i].ConnectIndexStart == index || springArray[i].ConnectIndexEnd == index)
@@ -372,14 +373,14 @@ public class ClothSystem : MonoBehaviour
                 Vector3 tempForce = springArray[i].CountForce(StartSpeed, EndSpeed, StartPos, EndPos);
 
                 if (index == springArray[i].ConnectIndexStart)
-                    appendSpeedK2 += tempForce / Mass * Time.fixedDeltaTime;
+                    appendSpeedK2 += tempForce / Mass * TimeStep;
                 else
-                    appendSpeedK2 -= tempForce / Mass * Time.fixedDeltaTime;
+                    appendSpeedK2 -= tempForce / Mass * TimeStep;
             }
         }
         Vector3 k2 = EulerMethodWithAppendForce(index, time / 2, appendSpeedK2);
         // K3
-        Vector3 appendSpeedK3 = Vector3.up * Gravity * Time.deltaTime / 2;
+        Vector3 appendSpeedK3 = Vector3.up * Gravity * TimeStep / 2;
         for (int i = 0; i < springArray.Count; i++)
         {
             if (springArray[i].ConnectIndexStart == index || springArray[i].ConnectIndexEnd == index)
@@ -397,14 +398,14 @@ public class ClothSystem : MonoBehaviour
                 Vector3 tempForce = springArray[i].CountForce(StartSpeed, EndSpeed, StartPos, EndPos);
 
                 if (index == springArray[i].ConnectIndexStart)
-                    appendSpeedK3 += tempForce / Mass * Time.fixedDeltaTime;
+                    appendSpeedK3 += tempForce / Mass * TimeStep;
                 else
-                    appendSpeedK3 -= tempForce / Mass * Time.fixedDeltaTime;
+                    appendSpeedK3 -= tempForce / Mass * TimeStep;
             }
         }
         Vector3 k3 = EulerMethodWithAppendForce(index, time / 2, appendSpeedK3);
         // K4
-        Vector3 appendSpeedK4 = Vector3.up * Gravity * Time.deltaTime / 2;                                  // V = a t
+        Vector3 appendSpeedK4 = Vector3.up * Gravity * TimeStep / 2;                                  // V = a t
         for (int i = 0; i < springArray.Count; i++)
             if (springArray[i].ConnectIndexStart == index || springArray[i].ConnectIndexEnd == index)
             {
@@ -421,9 +422,9 @@ public class ClothSystem : MonoBehaviour
                 Vector3 tempForce = springArray[i].CountForce(StartSpeed, EndSpeed, StartPos, EndPos);
 
                 if (index == springArray[i].ConnectIndexStart)
-                    appendSpeedK4 += tempForce / Mass * Time.fixedDeltaTime;
+                    appendSpeedK4 += tempForce / Mass * TimeStep;
                 else
-                    appendSpeedK4 -= tempForce / Mass * Time.fixedDeltaTime;
+                    appendSpeedK4 -= tempForce / Mass * TimeStep;
             }
 
         Vector3 k4 = EulerMethodWithAppendForce(index, time, appendSpeedK4);
