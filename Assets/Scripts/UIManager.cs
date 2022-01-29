@@ -29,6 +29,8 @@ public class UIManager : MonoBehaviour
     public Toggle ParticleVisibilityToggle;
     public Toggle TextureVisibilityToggle;
 
+    public InputField TimeStepInputField;
+
     public Button PlayButton;
     public Button SaveButton;
     public Button LoadButton;
@@ -40,6 +42,7 @@ public class UIManager : MonoBehaviour
     private int sideLength;
     private float space;
     private Vector3 initialPosition;
+    private float timeStep;
 
     private bool isPlaying;
 
@@ -59,6 +62,7 @@ public class UIManager : MonoBehaviour
         SpringVisibilityToggle.onValueChanged.AddListener(SetSpringVisibility);
         ParticleVisibilityToggle.onValueChanged.AddListener(SetParticleVisibility);
         TextureVisibilityToggle.onValueChanged.AddListener(SetTextureVisibility);
+        TimeStepInputField.onEndEdit.AddListener(SetTimeStep);
         PlayButton.onClick.AddListener(Play);
         SaveButton.onClick.AddListener(Save);
         LoadButton.onClick.AddListener(Load);
@@ -70,6 +74,7 @@ public class UIManager : MonoBehaviour
         SetInitialX(XInputField.text);
         SetInitialY(YInputField.text);
         SetInitialZ(ZInputField.text);
+        SetTimeStep(TimeStepInputField.text);
     }
 
     public void SetMass(string s)
@@ -127,6 +132,7 @@ public class UIManager : MonoBehaviour
         ClothSystem cloth = ControllPntManager.Instance.NowClick.transform.parent.GetComponent<ClothSystem>();
         cloth.Mass = mass;
         cloth.ForceStatus = method;
+        cloth.TimeStep = timeStep;
     }
 
     public void LockParticle()
@@ -156,6 +162,11 @@ public class UIManager : MonoBehaviour
             cloth.SetTextureVisibility(b);
     }
 
+    public void SetTimeStep(string s)
+    {
+        timeStep = Convert.ToSingle(s);
+    }
+
     public void Play()
     {
         isPlaying = !isPlaying;
@@ -180,6 +191,7 @@ public class UIManager : MonoBehaviour
         configure["X"] = initialPosition.x;
         configure["Y"] = initialPosition.y;
         configure["Z"] = initialPosition.z;
+        configure["TimeStep"] = timeStep;
         string json = JsonConvert.SerializeObject(configure, new JsonSerializerSettings()
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
@@ -210,6 +222,7 @@ public class UIManager : MonoBehaviour
             initialPosition.x = Convert.ToSingle(configure["X"]);
             initialPosition.y = Convert.ToSingle(configure["Y"]);
             initialPosition.z = Convert.ToSingle(configure["Z"]);
+            timeStep = Convert.ToSingle(configure["TimeStep"]);
             MassInputField.text = mass.ToString();
             MethodDropDown.value = (int)method;
             SideLengthInputField.text = sideLength.ToString();
@@ -217,6 +230,7 @@ public class UIManager : MonoBehaviour
             XInputField.text = initialPosition.x.ToString();
             YInputField.text = initialPosition.y.ToString();
             ZInputField.text = initialPosition.z.ToString();
+            TimeStepInputField.text = timeStep.ToString();
         }
     }
 }
