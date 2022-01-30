@@ -326,15 +326,15 @@ public class ClothSystem : MonoBehaviour
                 // 拿資料
                 Vector3 StartSpeed = speedArray[StartIndex];
                 Vector3 EndSpeed = speedArray[EndIndex];
-                Vector3 StartPos = Vertexes[StartIndex] + EulerMethod(StartIndex, time / 2);
-                Vector3 EndPos = Vertexes[EndIndex] + EulerMethod(EndIndex, time / 2);
+                Vector3 StartPos = Vertexes[StartIndex] + EulerMethod(StartIndex, time / 2) / 2.0f;
+                Vector3 EndPos = Vertexes[EndIndex] + EulerMethod(EndIndex, time / 2) / 2.0f;
 
                 Vector3 tempForce = springArray[i].CountForce(StartSpeed, EndSpeed, StartPos, EndPos);
 
                 if (index == springArray[i].ConnectIndexStart)
-                    appendSpeedK2 += tempForce / Mass * TimeStep;
+                    appendSpeedK2 += tempForce / Mass * TimeStep / 2.0f;
                 else
-                    appendSpeedK2 -= tempForce / Mass * TimeStep;
+                    appendSpeedK2 -= tempForce / Mass * TimeStep / 2.0f;
             }
         }
         Vector3 k2 = EulerMethodWithAppendForce(index, time / 2, appendSpeedK2);
@@ -367,15 +367,15 @@ public class ClothSystem : MonoBehaviour
                 // 拿資料
                 Vector3 StartSpeed = speedArray[StartIndex];
                 Vector3 EndSpeed = speedArray[EndIndex];
-                Vector3 StartPos = Vertexes[StartIndex] + EulerMethod(StartIndex, time / 2);
-                Vector3 EndPos = Vertexes[EndIndex] + EulerMethod(EndIndex, time / 2);
+                Vector3 StartPos = Vertexes[StartIndex] + EulerMethod(StartIndex, time / 2) / 2.0f;
+                Vector3 EndPos = Vertexes[EndIndex] + EulerMethod(EndIndex, time / 2) / 2.0f;
 
                 Vector3 tempForce = springArray[i].CountForce(StartSpeed, EndSpeed, StartPos, EndPos);
 
                 if (index == springArray[i].ConnectIndexStart)
-                    appendSpeedK2 += tempForce / Mass * TimeStep;
+                    appendSpeedK2 += tempForce / Mass * TimeStep / 2.0f;
                 else
-                    appendSpeedK2 -= tempForce / Mass * TimeStep;
+                    appendSpeedK2 -= tempForce / Mass * TimeStep / 2.0f ;
             }
         }
         Vector3 k2 = EulerMethodWithAppendForce(index, time / 2, appendSpeedK2);
@@ -392,20 +392,20 @@ public class ClothSystem : MonoBehaviour
                 // 拿資料
                 Vector3 StartSpeed = speedArray[StartIndex];
                 Vector3 EndSpeed = speedArray[EndIndex];
-                Vector3 StartPos = Vertexes[StartIndex] + EulerMethodWithAppendForce(index, time / 2, appendSpeedK2);
-                Vector3 EndPos = Vertexes[EndIndex] + EulerMethodWithAppendForce(index, time / 2, appendSpeedK2);
+                Vector3 StartPos = Vertexes[StartIndex] + EulerMethodWithAppendForce(index, time / 2, appendSpeedK2) / 2.0f;
+                Vector3 EndPos = Vertexes[EndIndex] + EulerMethodWithAppendForce(index, time / 2, appendSpeedK2) / 2.0f;
 
                 Vector3 tempForce = springArray[i].CountForce(StartSpeed, EndSpeed, StartPos, EndPos);
 
                 if (index == springArray[i].ConnectIndexStart)
-                    appendSpeedK3 += tempForce / Mass * TimeStep;
+                    appendSpeedK3 += tempForce / Mass * TimeStep / 2.0f;
                 else
-                    appendSpeedK3 -= tempForce / Mass * TimeStep;
+                    appendSpeedK3 -= tempForce / Mass * TimeStep / 2.0f;
             }
         }
         Vector3 k3 = EulerMethodWithAppendForce(index, time / 2, appendSpeedK3);
         // K4
-        Vector3 appendSpeedK4 = Vector3.up * Gravity * TimeStep / 2;                                  // V = a t
+        Vector3 appendSpeedK4 = Vector3.up * Gravity * TimeStep;                                  // V = a t
         for (int i = 0; i < springArray.Count; i++)
             if (springArray[i].ConnectIndexStart == index || springArray[i].ConnectIndexEnd == index)
             {
